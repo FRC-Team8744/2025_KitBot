@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -12,7 +13,8 @@ import frc.robot.Constants.RollerConstants;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+// import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 // import com.revrobotics.spark.SparkMax;
 // import com.revrobotics.spark.SparkBase.PersistMode;
 // import com.revrobotics.spark.SparkBase.ResetMode;
@@ -22,12 +24,16 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 /** Class to run the rollers over CAN */
 public class CANRollerSubsystem extends SubsystemBase {
   // private final SparkMax rollerMotor;
-  private final VictorSPX rollerMotor;
+  // private final VictorSPX rollerMotor;
+  private final TalonSRX rollerMotor;
 
   public CANRollerSubsystem() {
     // Set up the roller motor as a brushed motor
     // rollerMotor = new SparkMax(RollerConstants.ROLLER_MOTOR_ID, MotorType.kBrushed);
-    rollerMotor = new VictorSPX(RollerConstants.ROLLER_MOTOR_ID);
+    // rollerMotor = new VictorSPX(RollerConstants.ROLLER_MOTOR_ID);
+    rollerMotor = new TalonSRX(RollerConstants.ROLLER_MOTOR_ID);
+
+    SmartDashboard.putNumber("Firmware", rollerMotor.getFirmwareVersion());
 
     // Set can timeout. Because this project only sets parameters once on
     // construction, the timeout can be long without blocking robot operation. Code
