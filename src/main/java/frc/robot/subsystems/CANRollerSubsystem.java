@@ -9,14 +9,17 @@ import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+// import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.RollerConstants;
 import java.util.function.DoubleSupplier;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType; 
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+// import com.revrobotics.spark.SparkMax;
+// import com.revrobotics.spark.SparkBase.PersistMode;
+// import com.revrobotics.spark.SparkBase.ResetMode;
+// import com.revrobotics.spark.SparkLowLevel.MotorType; 
+// import com.revrobotics.spark.config.SparkMaxConfig;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -40,10 +43,12 @@ public class CANRollerSubsystem extends SubsystemBase {
     // the roller behave the same as the battery
     // voltage dips. The current limit helps prevent breaker trips or burning out
     // the motor in the event the roller stalls.
-    // SparkMaxConfig rollerConfig = new SparkMaxConfig();
-    // rollerConfig.voltageCompensation(RollerConstants.ROLLER_MOTOR_VOLTAGE_COMP);
-    // rollerConfig.smartCurrentLimit(RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT);
-    // rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // // SparkMaxConfig rollerConfig = new SparkMaxConfig();
+    // // rollerConfig.voltageCompensation(RollerConstants.ROLLER_MOTOR_VOLTAGE_COMP);
+    // // rollerConfig.smartCurrentLimit(RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT);
+    // // rollerMotor.configure(rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
   }
 
   @Override

@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 import com.revrobotics.RelativeEncoder;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -36,10 +38,12 @@ public class CANDriveSubsystem extends SubsystemBase {
   private RelativeEncoder m_EncoderRight; 
   private final DifferentialDrive drive;
 
-  private PigeonIMU gyro; 
+  // private PigeonIMU gyro; 
  // Create Field2d for robot and trajectory visualizations.
   public Field2d m_field;
   private final DifferentialDriveOdometry m_odometry;
+
+  private PigeonIMU gyro;
 
   public CANDriveSubsystem() {
     
@@ -59,6 +63,10 @@ public class CANDriveSubsystem extends SubsystemBase {
 
     gyro = new PigeonIMU(13);
    
+
+    // Gryo objects
+    gyro = new PigeonIMU(13);
+    // PigeonIMU.GeneralStatus gyro_stat = new PigeonIMU.GeneralStatus();
 
     // Set can timeout. Because this project only sets parameters once on
     // construction, the timeout can be long without blocking robot operation. Code
@@ -118,6 +126,7 @@ public class CANDriveSubsystem extends SubsystemBase {
 
   private double getEncoderMeters(RelativeEncoder enc){
     return enc.getPosition()*DriveConstants.kEncoderDistancePerRevolution; 
+    // SmartDashboard.putNumber("Gyro Z", gyro.getYaw());
   }
 
   // Command to drive the robot with joystick inputs
