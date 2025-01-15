@@ -56,7 +56,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     leftLeader = new SparkMax(DriveConstants.LEFT_LEADER_ID, MotorType.kBrushless);
     leftFollower = new SparkMax(DriveConstants.LEFT_FOLLOWER_ID, MotorType.kBrushless);
     rightLeader = new SparkMax(DriveConstants.RIGHT_LEADER_ID, MotorType.kBrushless);
-    rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless); 
+    rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless);
 
     // set up differential drive class
     drive = new DifferentialDrive(leftLeader, rightLeader);
@@ -66,6 +66,7 @@ public class CANDriveSubsystem extends SubsystemBase {
 
     // Gryo objects
     gyro = new PigeonIMU(13);
+  
     // PigeonIMU.GeneralStatus gyro_stat = new PigeonIMU.GeneralStatus();
 
     // Set can timeout. Because this project only sets parameters once on
