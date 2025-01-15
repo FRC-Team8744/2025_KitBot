@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -13,6 +14,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,6 +28,8 @@ public class CANDriveSubsystem extends SubsystemBase {
 
   private final DifferentialDrive drive;
 
+  private PigeonIMU gyro;
+
   public CANDriveSubsystem() {
     // create brushed motors for drive
     leftLeader = new SparkMax(DriveConstants.LEFT_LEADER_ID, MotorType.kBrushed);
@@ -35,6 +39,10 @@ public class CANDriveSubsystem extends SubsystemBase {
 
     // set up differential drive class
     drive = new DifferentialDrive(leftLeader, rightLeader);
+
+    // Gryo objects
+    gyro = new PigeonIMU(13);
+    // PigeonIMU.GeneralStatus gyro_stat = new PigeonIMU.GeneralStatus();
 
     // Set can timeout. Because this project only sets parameters once on
     // construction, the timeout can be long without blocking robot operation. Code
@@ -72,6 +80,7 @@ public class CANDriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Gyro Z", gyro.getYaw());
   }
 
   // Command to drive the robot with joystick inputs
