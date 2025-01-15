@@ -9,10 +9,12 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,18 +22,19 @@ import frc.robot.Constants.DriveConstants;
 
 public class CANDriveSubsystem extends SubsystemBase {
   private final SparkMax leftLeader;
-  // private final SparkMax leftFollower;
+   private final SparkMax leftFollower;
   private final SparkMax rightLeader;
-  // private final SparkMax rightFollower;
-
+   private final SparkMax rightFollower;
+private RelativeEncoder m_Encoder;
+private RelativeEncoder m_Rencoder;
   private final DifferentialDrive drive;
 
   public CANDriveSubsystem() {
     // create brushed motors for drive
     leftLeader = new SparkMax(DriveConstants.LEFT_LEADER_ID, MotorType.kBrushless);
-    //leftFollower = new SparkMax(DriveConstants.LEFT_FOLLOWER_ID, MotorType.kBrushless);
+    leftFollower = new SparkMax(DriveConstants.LEFT_FOLLOWER_ID, MotorType.kBrushless);
     rightLeader = new SparkMax(DriveConstants.RIGHT_LEADER_ID, MotorType.kBrushless);
-    //rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless);
+    rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless);
 
     // set up differential drive class
     drive = new DifferentialDrive(leftLeader, rightLeader);
@@ -51,24 +54,32 @@ public class CANDriveSubsystem extends SubsystemBase {
     config.smartCurrentLimit(DriveConstants.DRIVE_MOTOR_CURRENT_LIMIT);
 
     // Set configuration to follow leader and then apply it to corresponding
-    // follower. Resetting in case a new controller is swapped
+     //follower. Resetting in case a new controller is swapped
     // in and persisting in case of a controller reset due to breaker trip
     config.follow(leftLeader);
-    //leftFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    leftFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     config.follow(rightLeader);
-   // rightFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    rightFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // Remove following, then apply config to right leader
     config.disableFollowerMode();
+    config.inverted(true);
     rightLeader.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // Set conifg to inverted and then apply to left leader. Set Left side inverted
     // so that postive values drive both sides forward
-    config.inverted(true);
+    config.inverted(false);
     leftLeader.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    m_Encoder= leftLeader.getEncoder();
+    m_Rencoder = rightLeader.getEncoder();
+    m_Encoder.setPosition(0.0);
+    m_Rencoder.setPosition(0.0);
   }
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("encoder", m_Encoder.getPosition());
+    SmartDashboard.putNumber("Rencoder", m_Rencoder.getPosition());
   }
 
   // Command to drive the robot with joystick inputs
