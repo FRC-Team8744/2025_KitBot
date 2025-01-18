@@ -12,13 +12,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CANDriveSubsystem;
 
 // Command to run the robot at 1/2 power for 1 second in autonomous
-public class AutoCommand extends Command {
+public class AutoShort extends Command {
   CANDriveSubsystem driveSubsystem;
   private Timer timer;
-  private double seconds = 3.2;
+  private double seconds = 3.05;
 
   // Constructor. Runs only once when the command is first created.
-  public AutoCommand(CANDriveSubsystem driveSubsystem) {
+  public AutoShort(CANDriveSubsystem driveSubsystem) {
     // Save parameter for use later and initialize timer object.
     this.driveSubsystem = driveSubsystem;
     timer = new Timer();

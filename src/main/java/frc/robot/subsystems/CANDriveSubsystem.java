@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -96,6 +97,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     SparkMaxConfig config = new SparkMaxConfig();
     config.voltageCompensation(12);
     config.smartCurrentLimit(DriveConstants.DRIVE_MOTOR_CURRENT_LIMIT);
+    config.idleMode(IdleMode.kBrake);
 
     // Set configuration to follow leader and then apply it to corresponding
     // follower. Resetting in case a new controller is swapped

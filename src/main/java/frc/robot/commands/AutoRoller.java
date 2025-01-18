@@ -9,23 +9,23 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.CANDriveSubsystem;
+import frc.robot.subsystems.CANRollerSubsystem;
 
 // Command to run the robot at 1/2 power for 1 second in autonomous
-public class AutoCommand extends Command {
-  CANDriveSubsystem driveSubsystem;
+public class AutoRoller extends Command {
+  CANRollerSubsystem rollerSubsystem;
   private Timer timer;
-  private double seconds = 3.2;
+  private double seconds = .5;
 
   // Constructor. Runs only once when the command is first created.
-  public AutoCommand(CANDriveSubsystem driveSubsystem) {
+  public AutoRoller(CANRollerSubsystem rollerSubsystem) {
     // Save parameter for use later and initialize timer object.
-    this.driveSubsystem = driveSubsystem;
+    this.rollerSubsystem = rollerSubsystem;
     timer = new Timer();
 
     // Declare subsystems required by this command. This should include any
     // subsystem this command sets and output of
-    addRequirements(driveSubsystem);
+    addRequirements(rollerSubsystem);
   }
 
   // Runs each time the command is scheduled. For this command, we handle starting
@@ -42,14 +42,14 @@ public class AutoCommand extends Command {
   @Override
   public void execute() {
     // drive at 1/2 speed
-    driveSubsystem.driveArcade(0.4, 0.0);
+    rollerSubsystem.runRoller(0.0, 0.5);
   }
 
   // Runs each time the command ends via isFinished or being interrupted.
   @Override
   public void end(boolean isInterrupted) {
     // stop drive motors
-    driveSubsystem.driveArcade(0.0, 0.0);
+    rollerSubsystem.runRoller(0.0, 0.0);
   }
 
   // Runs every cycle while the command is scheduled to check if the command is
