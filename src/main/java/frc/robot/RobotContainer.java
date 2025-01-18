@@ -71,7 +71,9 @@ public class RobotContainer {
     // value ejecting the gamepiece while the button is held
     driverController.a()
         .whileTrue(rollerSubsystem.runRoller(rollerSubsystem, () -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0));
-
+    driverController.leftBumper()
+        .onTrue(driveSubsystem.SetSlowSpeed())
+        .onFalse(driveSubsystem.SetFastSpeed());
     // Set the default command for the drive subsystem to the command provided by
     // factory with the values provided by the joystick axes on the driver
     // controller. The Y axis of the controller is inverted so that pushing the

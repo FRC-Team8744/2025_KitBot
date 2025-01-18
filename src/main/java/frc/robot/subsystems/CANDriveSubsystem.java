@@ -41,7 +41,12 @@ public class CANDriveSubsystem extends SubsystemBase {
   public Field2d m_field;
   private final DifferentialDriveOdometry m_odometry;
 
+  private double Maxspeed;
+
   public CANDriveSubsystem() {
+
+    // Max speed is the fastest it can go 
+    Maxspeed = 1.0;
     
   // Create and push Field2d to SmartDashboard.
     m_field = new Field2d();
@@ -117,10 +122,22 @@ public class CANDriveSubsystem extends SubsystemBase {
     return enc.getPosition()*DriveConstants.kEncoderDistancePerRevolution; 
   }
 
+  public void setMaxSpeed(double value){
+    Maxspeed = value;
+  }
+
+public Command SetSlowSpeed(){
+  return this.runOnce(() -> setMaxSpeed(0.5));
+}
+
+public Command SetFastSpeed(){
+  return this.runOnce(() -> setMaxSpeed(1));
+}
+
   // Command to drive the robot with joystick inputs
   public Command driveArcade(
       CANDriveSubsystem driveSubsystem, DoubleSupplier xSpeed, DoubleSupplier zRotation) {
     return Commands.run(
-        () -> drive.arcadeDrive(xSpeed.getAsDouble(), zRotation.getAsDouble()), driveSubsystem);
+        () -> drive.arcadeDrive(xSpeed.getAsDouble()*Maxspeed, zRotation.getAsDouble()), driveSubsystem);
   }
 }
