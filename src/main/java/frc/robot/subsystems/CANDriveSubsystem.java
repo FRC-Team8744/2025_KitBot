@@ -160,10 +160,15 @@ public class CANDriveSubsystem extends SubsystemBase {
     leftPid.setReference(leftSpeed, SparkMax.ControlType.kVelocity);
   }
 
-  // Command to drive the robot with joystick inputs
-  public Command driveArcade(
-      CANDriveSubsystem driveSubsystem, DoubleSupplier xSpeed, DoubleSupplier zRotation) {
-    return Commands.run(
-        () -> drive.arcadeDrive(xSpeed.getAsDouble(), zRotation.getAsDouble()), driveSubsystem);
-  }
+    // sets the speed of the drive motors
+    public void driveArcade(double xSpeed, double zRotation) {
+      drive.arcadeDrive(xSpeed, zRotation);
+    }
+  
+  // // Command to drive the robot with joystick inputs
+  // public Command driveArcade(
+  //     CANDriveSubsystem driveSubsystem, DoubleSupplier xSpeed, DoubleSupplier zRotation) {
+  //   return Commands.run(
+  //       () -> drive.arcadeDrive(xSpeed.getAsDouble(), zRotation.getAsDouble()), driveSubsystem);
+  // }
 }
