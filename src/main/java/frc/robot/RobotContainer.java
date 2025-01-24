@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -13,6 +14,13 @@ import frc.robot.Constants.RollerConstants;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.CANRollerSubsystem;
+
+import frc.robot.commands.AutoCommand;
+import frc.robot.commands.AutoShort;
+import frc.robot.commands.AutoTurn;
+import frc.robot.commands.DriveCommand;
+import frc.robot.commands.RollerCommand;
+import frc.robot.commands.ScoreCoral;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -47,10 +55,20 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
 
+    // // Set the options to show up in the Dashboard for selecting auto modes. If you
+    // // add additional auto modes you can add additional lines here with
+    // // autoChooser.addOption
+    // autoChooser.setDefaultOption("Autonomous", Autos.exampleAuto(driveSubsystem));
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
-    autoChooser.setDefaultOption("Autonomous", Autos.exampleAuto(driveSubsystem));
+    autoChooser.addOption("Autonomous", new AutoCommand(driveSubsystem));
+    autoChooser.addOption("AutoTurn", new AutoTurn(driveSubsystem));
+    autoChooser.addOption("AutoShort", new AutoShort(driveSubsystem));
+    autoChooser.setDefaultOption("ScoreCoral", new ScoreCoral(driveSubsystem, rollerSubsystem));
+    
+
+    SmartDashboard.putData("Auto Path", autoChooser);
   }
 
   /**
@@ -71,25 +89,46 @@ public class RobotContainer {
     
     // Set the A button to run the "runRoller" command from the factory with a fixed
     // value ejecting the gamepiece while the button is held
+    // driverController.a()
+    //     .whileTrue(rollerSubsystem.runRoller(rollerSubsystem, () -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0));
     driverController.a()
-        .whileTrue(rollerSubsystem.runRoller(rollerSubsystem, () -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0));
+        .whileTrue(new RollerCommand(() -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0, rollerSubsystem));
 
-    // Set the default command for the drive subsystem to the command provided by
-    // factory with the values provided by the joystick axes on the driver
+    // // Set the default command for the drive subsystem to the command provided by
+    // // factory with the values provided by the joystick axes on the driver
+    // // controller. The Y axis of the controller is inverted so that pushing the
+    // // stick away from you (a negative value) drives the robot forwards (a positive
+    // // value)
+    // driveSubsystem.setDefaultCommand(
+    //     driveSubsystem.driveArcade(
+    //         driveSubsystem, () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
+
+    // Set the default command for the drive subsystem to an instance of the
+    // DriveCommand with the values provided by the joystick axes on the driver
     // controller. The Y axis of the controller is inverted so that pushing the
     // stick away from you (a negative value) drives the robot forwards (a positive
-    // value)
-    driveSubsystem.setDefaultCommand(
-        driveSubsystem.driveArcade(
-            driveSubsystem, () -> -driverController.getLeftY(), () -> -driverController.getRightX()));
+    // value). Similarly for the X axis where we need to flip the value so the
+    // joystick matches the WPILib convention of counter-clockwise positive
+    driveSubsystem.setDefaultCommand(new DriveCommand(
+        () -> -driverController.getLeftY() *
+            (driverController.getHID().getRightBumperButton() ? 1 : 0.5),
+        () -> -driverController.getRightX(),
+        driveSubsystem));
 
-    // Set the default command for the roller subsystem to the command from the
-    // factory with the values provided by the triggers on the operator controller
-    rollerSubsystem.setDefaultCommand(
-        rollerSubsystem.runRoller(
-            rollerSubsystem,
-            () -> driverController.getRightTriggerAxis(),
-            () -> driverController.getLeftTriggerAxis()));
+    // // Set the default command for the roller subsystem to the command from the
+    // // factory with the values provided by the triggers on the operator controller
+    // rollerSubsystem.setDefaultCommand(
+    //     rollerSubsystem.runRoller(
+    //         rollerSubsystem,
+    //         () -> driverController.getRightTriggerAxis(),
+    //         () -> driverController.getLeftTriggerAxis()));
+    // Set the default command for the roller subsystem to an instance of
+    // RollerCommand with the values provided by the triggers on the operator
+    // controller
+    rollerSubsystem.setDefaultCommand(new RollerCommand(
+        () -> driverController.getRightTriggerAxis(),
+        () -> driverController.getLeftTriggerAxis(),
+        rollerSubsystem));
   }
 
   /**
