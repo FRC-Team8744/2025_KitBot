@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
+import com.revrobotics.RelativeEncoder;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -13,31 +15,51 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 
 public class CANDriveSubsystem extends SubsystemBase {
+  
+  private Lightbar Bar_bobik;
   private final SparkMax leftLeader;
    private final SparkMax leftFollower;
   private final SparkMax rightLeader;
-   private final SparkMax rightFollower;
-private RelativeEncoder m_Encoder;
-private RelativeEncoder m_Rencoder;
+  private final SparkMax rightFollower;
+  private RelativeEncoder m_EncoderLeft;
+  private RelativeEncoder m_EncoderRight; 
   private final DifferentialDrive drive;
 
+  private PigeonIMU gyro; 
+ // Create Field2d for robot and trajectory visualizations.
+  public Field2d m_field;
+  private final DifferentialDriveOdometry m_odometry;
+
   public CANDriveSubsystem() {
+    
+  // Create and push Field2d to SmartDashboard.
+    m_field = new Field2d();
+    SmartDashboard.putData(m_field);
+    Bar_bobik = new Lightbar();
+
     // create brushed motors for drive
     leftLeader = new SparkMax(DriveConstants.LEFT_LEADER_ID, MotorType.kBrushless);
     leftFollower = new SparkMax(DriveConstants.LEFT_FOLLOWER_ID, MotorType.kBrushless);
     rightLeader = new SparkMax(DriveConstants.RIGHT_LEADER_ID, MotorType.kBrushless);
-    rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless);
+    rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless); 
 
     // set up differential drive class
     drive = new DifferentialDrive(leftLeader, rightLeader);
+
+    gyro = new PigeonIMU(13);
+   
 
     // Set can timeout. Because this project only sets parameters once on
     // construction, the timeout can be long without blocking robot operation. Code
@@ -70,16 +92,30 @@ private RelativeEncoder m_Rencoder;
     config.inverted(false);
     leftLeader.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    m_Encoder= leftLeader.getEncoder();
-    m_Rencoder = rightLeader.getEncoder();
-    m_Encoder.setPosition(0.0);
-    m_Rencoder.setPosition(0.0);
+    m_EncoderLeft = leftLeader.getEncoder();
+    m_EncoderRight = rightLeader.getEncoder();
+    m_EncoderLeft.setPosition(0.0);
+    m_EncoderRight.setPosition(0.0);
+    gyro.setYaw(0.0);  
+    
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight));
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("encoder", m_Encoder.getPosition());
-    SmartDashboard.putNumber("Rencoder", m_Rencoder.getPosition());
+    
+    SmartDashboard.putNumber("Gyro Z", gyro.getYaw());
+  
+    SmartDashboard.putNumber("EncoderLeft", getEncoderMeters(m_EncoderLeft));
+    SmartDashboard.putNumber("EncoderRight", getEncoderMeters(m_EncoderRight));
+    // SmartDashboard.putNumber("xValue", RobotContainer.driverController.getLeftY());
+
+    m_odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight));
+    m_field.setRobotPose(m_odometry.getPoseMeters());
+  }
+
+  private double getEncoderMeters(RelativeEncoder enc){
+    return enc.getPosition()*DriveConstants.kEncoderDistancePerRevolution; 
   }
 
   // Command to drive the robot with joystick inputs

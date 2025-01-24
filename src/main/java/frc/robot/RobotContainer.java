@@ -29,10 +29,12 @@ public class RobotContainer {
   private final CANRollerSubsystem rollerSubsystem = new CANRollerSubsystem();
 
   // The driver's controller
-  private final CommandXboxController driverController = new CommandXboxController(
+  public final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.DRIVER_CONTROLLER_PORT);
 
   // The operator's controller
+  // private final CommandXboxController operatorController = new CommandXboxController(
+  //     OperatorConstants.OPERATOR_CONTROLLER_PORT);
   // private final CommandXboxController operatorController = new CommandXboxController(
   //     OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
@@ -66,6 +68,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    
     // Set the A button to run the "runRoller" command from the factory with a fixed
     // value ejecting the gamepiece while the button is held
     driverController.a()
@@ -84,7 +87,7 @@ public class RobotContainer {
     // factory with the values provided by the triggers on the operator controller
     rollerSubsystem.setDefaultCommand(
         rollerSubsystem.runRoller(
-           rollerSubsystem,
+            rollerSubsystem,
             () -> driverController.getRightTriggerAxis(),
             () -> driverController.getLeftTriggerAxis()));
   }

@@ -24,6 +24,15 @@ public final class Constants {
     public static final int RIGHT_FOLLOWER_ID = 8;
 
     public static final int DRIVE_MOTOR_CURRENT_LIMIT = 20;
+
+    public static final double kConvertInchToMeter = 0.0254;
+    public static final double kGearRatio = 10.71;
+    private static final double kTrackWidthInch = 18.5;
+    private static final double kTrackWidth = kTrackWidthInch * kConvertInchToMeter; // meters
+    public static final double kWheelDiameterInches = 6.0;
+    public static final double kWheelDiameterMeters = kWheelDiameterInches * kConvertInchToMeter;
+    public static final double kEncoderDistancePerRevolution = (kWheelDiameterMeters * Math.PI) / kGearRatio;
+  
   }
 
   public static final class RollerConstants {
