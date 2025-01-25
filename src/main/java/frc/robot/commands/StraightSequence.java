@@ -11,11 +11,11 @@ import frc.robot.subsystems.CANRollerSubsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ScoreCoral extends SequentialCommandGroup {
+public class StraightSequence extends SequentialCommandGroup {
   CANDriveSubsystem driveSubsystem;
   CANRollerSubsystem rollerSubsystem;
-  /** Creates a new ScoreCoral. */
-  public ScoreCoral(CANDriveSubsystem driveSubsystem, CANRollerSubsystem rollerSubsystem) {
+  /** Creates a new StraightSequence. */
+  public StraightSequence(CANDriveSubsystem driveSubsystem, CANRollerSubsystem rollerSubsystem) {
     this.driveSubsystem = driveSubsystem;
     this.rollerSubsystem = rollerSubsystem;
 
@@ -23,6 +23,6 @@ public class ScoreCoral extends SequentialCommandGroup {
     addRequirements(rollerSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new AutoCommand(driveSubsystem), new AutoTurnPID(45, driveSubsystem), new AutoShort(driveSubsystem), new AutoRoller(rollerSubsystem));
+    addCommands(new AutoStraight(driveSubsystem, 3.2), new AutoRoller(rollerSubsystem));
   }
 }

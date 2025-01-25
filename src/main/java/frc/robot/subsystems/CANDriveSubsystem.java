@@ -15,6 +15,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.Joystick;
@@ -123,9 +124,12 @@ public class CANDriveSubsystem extends SubsystemBase {
     m_EncoderLeft.setPosition(0.0);
     m_EncoderRight.setPosition(0.0);
     gyro.setYaw(0.0);  
-    
+
+    double StartX = 8.016;
+    double StartY = 1.35;
+    // m_odometry.resetPosition(null, null, null, null);
     // m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight));
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight), new Pose2d(StartX, StartY, new Rotation2d(Math.PI)));
   }
 
   @Override
@@ -134,6 +138,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     // maxPid.setReference(setPoint, SparkMax.ControlType.kVelocity);
 
     // SmartDashboard.putNumber("SetPoint", setPoint);
+    
     SmartDashboard.putNumber("Velocity", m_EncoderLeft.getVelocity());
     SmartDashboard.putNumber("Velocity", m_EncoderRight.getVelocity());
     
@@ -143,6 +148,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("EncoderLeft", getEncoderMeters(m_EncoderLeft));
     SmartDashboard.putNumber("EncoderRight", getEncoderMeters(m_EncoderRight));
     // SmartDashboard.putNumber("xValue", RobotContainer.driverController.getLeftY());
+    SmartDashboard.putNumber("Heading", getHeading());
 
     m_odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight));
     m_field.setRobotPose(m_odometry.getPoseMeters());
@@ -167,6 +173,14 @@ public class CANDriveSubsystem extends SubsystemBase {
       drive.arcadeDrive(xSpeed, zRotation);
     }
   
+    // sets the speed of the drive motors
+    public void driveArcade(double xSpeed, double zRotation, boolean sqr) {
+      drive.arcadeDrive(xSpeed, zRotation, sqr);
+    }
+  
+    public double getHeading(){
+      return Math.IEEEremainder(gyro.getYaw(), 360);
+    }
   // // Command to drive the robot with joystick inputs
   // public Command driveArcade(
   //     CANDriveSubsystem driveSubsystem, DoubleSupplier xSpeed, DoubleSupplier zRotation) {

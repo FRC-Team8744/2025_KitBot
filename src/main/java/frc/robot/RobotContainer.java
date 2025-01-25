@@ -17,10 +17,14 @@ import frc.robot.subsystems.CANRollerSubsystem;
 
 import frc.robot.commands.AutoCommand;
 import frc.robot.commands.AutoShort;
+import frc.robot.commands.AutoStraight;
 import frc.robot.commands.AutoTurn;
+import frc.robot.commands.AutoTurnPID;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.RollerCommand;
 import frc.robot.commands.ScoreCoral;
+import frc.robot.commands.StraightSequence;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -61,10 +65,13 @@ public class RobotContainer {
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
     autoChooser.addOption("Autonomous", new AutoCommand(driveSubsystem));
-    autoChooser.addOption("AutoTurn", new AutoTurn(driveSubsystem));
+    autoChooser.addOption("AutoTurnPID", new AutoTurnPID(45, driveSubsystem));
+    autoChooser.addOption("AutoTurnPID2", new AutoTurnPID(-45, driveSubsystem));
     autoChooser.addOption("AutoShort", new AutoShort(driveSubsystem));
     autoChooser.setDefaultOption("ScoreCoral", new ScoreCoral(driveSubsystem, rollerSubsystem));
-    
+
+    autoChooser.addOption("StraightSequence", new StraightSequence(driveSubsystem, rollerSubsystem));
+    autoChooser.addOption("AutoStraight", new AutoStraight(driveSubsystem, 3.2));
 
     SmartDashboard.putData("Auto Path", autoChooser);
   }
