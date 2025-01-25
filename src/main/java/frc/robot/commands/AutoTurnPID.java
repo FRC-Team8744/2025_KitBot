@@ -13,7 +13,8 @@ import frc.robot.subsystems.CANDriveSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoTurnPID extends Command {
-  double P,I,D = 0.0;
+  double P = 0.01;
+  double I,D = 0.0;
     private final CANDriveSubsystem m_drive;
     PIDController m_turnCtrl = new PIDController(P, I, D);
     private double m_output;
@@ -42,9 +43,9 @@ public class AutoTurnPID extends Command {
   @Override
   public void execute() {
     m_heading = m_drive.getHeading();
-    m_output = MathUtil.clamp(m_turnCtrl.calculate(m_heading), -1.0, 1.0);
+    m_output = MathUtil.clamp(m_turnCtrl.calculate(m_heading), -0.4, 0.4);
     // Send PID output to drivebase
-    m_drive.driveArcade(0.0, -m_output, false);
+    m_drive.driveArcade(0.0, m_output, false);
     // m_drive.tankDriveVolts(m_output, -m_output);
 
     // Debug information

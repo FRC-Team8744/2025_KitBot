@@ -45,8 +45,8 @@ public class RobotContainer {
       OperatorConstants.DRIVER_CONTROLLER_PORT);
 
   // The operator's controller
-  // private final CommandXboxController operatorController = new CommandXboxController(
-  //     OperatorConstants.OPERATOR_CONTROLLER_PORT);
+  private final CommandXboxController operatorController = new CommandXboxController(
+      OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
   // The autonomous chooser
   private final SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -99,7 +99,7 @@ public class RobotContainer {
     driverController.a()
         .whileTrue(new RollerCommand(() -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0, rollerSubsystem));
 
-    // // Set the default command for the drive subsystem to the command provided by
+    // // Set the default   command for the drive subsystem to the command provided by
     // // factory with the values provided by the joystick axes on the driver
     // // controller. The Y axis of the controller is inverted so that pushing the
     // // stick away from you (a negative value) drives the robot forwards (a positive
