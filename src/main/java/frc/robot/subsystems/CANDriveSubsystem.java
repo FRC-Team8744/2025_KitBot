@@ -80,8 +80,8 @@ public class CANDriveSubsystem extends SubsystemBase {
     leftFollower = new SparkMax(DriveConstants.LEFT_FOLLOWER_ID, MotorType.kBrushless);
     rightLeader = new SparkMax(DriveConstants.RIGHT_LEADER_ID, MotorType.kBrushless);
     rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless); 
-    SparkClosedLoopController rightPid = rightLeader.getClosedLoopController();
-    SparkClosedLoopController leftPid = leftLeader.getClosedLoopController();
+    rightPid = rightLeader.getClosedLoopController();
+    leftPid = leftLeader.getClosedLoopController();
 
     // set up differential drive class
     drive = new DifferentialDrive(leftLeader, rightLeader);
@@ -127,24 +127,24 @@ public class CANDriveSubsystem extends SubsystemBase {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         // Set PID values for position control. We don't need to pass a closed
         // loop slot, as it will default to slot 0.
-        // .p(0.4)
-        // .i(0)
-        // .d(0)
+        .p(0, ClosedLoopSlot.kSlot0)
+        .i(0, ClosedLoopSlot.kSlot0)
+        .d(0, ClosedLoopSlot.kSlot0)
         // .outputRange(-1, 1)
         // Set PID values for velocity control in slot 1
         .p(kP, ClosedLoopSlot.kSlot1)
         .i(kI, ClosedLoopSlot.kSlot1)
         .d(kD, ClosedLoopSlot.kSlot1)
-        .velocityFF(1.0 / 5767, ClosedLoopSlot.kSlot1)
+        .velocityFF(kFF, ClosedLoopSlot.kSlot1)
         .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
 
     config.closedLoop.maxMotion
-        // Set MAXMotion parameters for position control. We don't need to pass
-        // a closed loop slot, as it will default to slot 0.
-        // .maxVelocity(1000)
-        // .maxAcceleration(1000)
-        // .allowedClosedLoopError(1)
-        // Set MAXMotion parameters for velocity control in slot 1
+    //     // Set MAXMotion parameters for position control. We don't need to pass
+    //     // a closed loop slot, as it will default to slot 0.
+        .maxVelocity(1000, ClosedLoopSlot.kSlot0)
+        .maxAcceleration(1000, ClosedLoopSlot.kSlot0)
+        .allowedClosedLoopError(1, ClosedLoopSlot.kSlot0)
+    //     // Set MAXMotion parameters for velocity control in slot 1
         .maxAcceleration(500, ClosedLoopSlot.kSlot1)
         .maxVelocity(6000, ClosedLoopSlot.kSlot1)
         .allowedClosedLoopError(1, ClosedLoopSlot.kSlot1);
@@ -170,7 +170,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     config.follow(rightLeader);
     rightFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    config.closedLoop.pid(kP, kI, kD);
+    // config.closedLoop.pid(kP, kI, kD);
 
     // Remove following, then apply config to right leader
     config.disableFollowerMode();
@@ -227,8 +227,10 @@ public class CANDriveSubsystem extends SubsystemBase {
     double leftSpeed = xSpeed - zRotation;
     double rightSpeed = xSpeed + zRotation;
 
-    rightPid.setReference(rightSpeed, SparkMax.ControlType.kVelocity);
-    leftPid.setReference(leftSpeed, SparkMax.ControlType.kVelocity);
+    rightPid.setReference(rightSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+    leftPid.setReference(leftSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+
+    drive.feed();
   }
 
     // sets the speed of the drive motors

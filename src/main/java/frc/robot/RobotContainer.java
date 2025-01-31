@@ -7,6 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -98,6 +100,10 @@ public class RobotContainer {
     //     .whileTrue(rollerSubsystem.runRoller(rollerSubsystem, () -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0));
     driverController.a()
         .whileTrue(new RollerCommand(() -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0, rollerSubsystem));
+
+    driverController.b()
+      // .whileTrue(new RunCommand(() -> driveSubsystem.driveArcade(1.0, 0.0), driveSubsystem));
+     .whileTrue(new RunCommand(() -> driveSubsystem.testDrive(3000.0, 0.0), driveSubsystem));
 
     // // Set the default command for the drive subsystem to the command provided by
     // // factory with the values provided by the joystick axes on the driver
