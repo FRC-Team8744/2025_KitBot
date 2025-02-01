@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.CANDriveSubsystem;
 import java.util.function.DoubleSupplier;
 
@@ -35,8 +36,8 @@ public class DriveCommand extends Command {
   // Runs every cycle while the command is scheduled (~50 times per second)
   @Override
   public void execute() {
-    driveSubsystem.driveArcade(xSpeed.getAsDouble(), zRotation.getAsDouble());
-    // driveSubsystem.testDrive(xSpeed.getAsDouble(), zRotation.getAsDouble());
+    // driveSubsystem.driveArcade(xSpeed.getAsDouble(), zRotation.getAsDouble());
+    driveSubsystem.driveVelocity(DriveConstants.kNeoMaxVelocity*xSpeed.getAsDouble(),DriveConstants.kNeoMaxVelocity*zRotation.getAsDouble());
   }
 
   // Runs each time the command ends via isFinished or being interrupted.

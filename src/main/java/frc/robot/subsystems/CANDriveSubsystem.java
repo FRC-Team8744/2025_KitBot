@@ -14,8 +14,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.Joystick;
@@ -27,6 +29,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
+
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 
 
@@ -54,11 +58,11 @@ public class CANDriveSubsystem extends SubsystemBase {
   public CANDriveSubsystem() {
 
     // PID coefficients
-    kP = 6e-5; 
+    kP = 0.005; //0.00002; //1e-4; 
     kI = 0;
     kD = 0; 
     kIz = 0; 
-    kFF = 0.000015; 
+    kFF = 0.23; //0.00017; //0.000015; 
     kMaxOutput = 1; 
     kMinOutput = -1;
     maxRPM = 5700;
@@ -73,8 +77,8 @@ public class CANDriveSubsystem extends SubsystemBase {
     leftFollower = new SparkMax(DriveConstants.LEFT_FOLLOWER_ID, MotorType.kBrushless);
     rightLeader = new SparkMax(DriveConstants.RIGHT_LEADER_ID, MotorType.kBrushless);
     rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless); 
-    SparkClosedLoopController rightPid = rightLeader.getClosedLoopController();
-    SparkClosedLoopController leftPid = leftLeader.getClosedLoopController();
+    rightPid = rightLeader.getClosedLoopController();
+    leftPid = leftLeader.getClosedLoopController();
 
     // set up differential drive class
     drive = new DifferentialDrive(leftLeader, rightLeader);
@@ -93,9 +97,33 @@ public class CANDriveSubsystem extends SubsystemBase {
     // battery). The current limit helps prevent tripping
     // breakers.
     SparkMaxConfig config = new SparkMaxConfig();
-    config.voltageCompensation(12);
+    // config.voltageCompensation(12);
     config.smartCurrentLimit(DriveConstants.DRIVE_MOTOR_CURRENT_LIMIT);
     config.idleMode(IdleMode.kBrake);
+
+    config.encoder
+      .positionConversionFactor(DriveConstants.kEncoderDistancePerRevolution)
+      .velocityConversionFactor(DriveConstants.kEncoderDistancePerRevolution / 60.0); //converting meters per second
+
+    config.closedLoop
+      .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+      .p(kP, ClosedLoopSlot.kSlot0)
+      .i(kI, ClosedLoopSlot.kSlot0)
+      .d(kD, ClosedLoopSlot.kSlot0)
+      .p(kP, ClosedLoopSlot.kSlot1)
+      .i(kI, ClosedLoopSlot.kSlot1)
+      .d(kD, ClosedLoopSlot.kSlot1)
+      .velocityFF(kFF, ClosedLoopSlot.kSlot1)
+      .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+    
+    config.closedLoop.maxMotion
+      .maxVelocity(1000, ClosedLoopSlot.kSlot0)
+      .maxAcceleration(100000, ClosedLoopSlot.kSlot0)
+      .allowedClosedLoopError(1, ClosedLoopSlot.kSlot0)
+
+      .maxVelocity(1000, ClosedLoopSlot.kSlot1)
+      .maxAcceleration(100000, ClosedLoopSlot.kSlot1)
+      .allowedClosedLoopError(1, ClosedLoopSlot.kSlot1);
 
     // Set configuration to follow leader and then apply it to corresponding
      //follower. Resetting in case a new controller is swapped
@@ -104,8 +132,6 @@ public class CANDriveSubsystem extends SubsystemBase {
     leftFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     config.follow(rightLeader);
     rightFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    config.closedLoop.pid(kP, kI, kD);
 
     // Remove following, then apply config to right leader
     config.disableFollowerMode();
@@ -121,9 +147,12 @@ public class CANDriveSubsystem extends SubsystemBase {
     m_EncoderLeft.setPosition(0.0);
     m_EncoderRight.setPosition(0.0);
     gyro.setYaw(0.0);  
-    
+
+    double StartX = 8.016;
+    double StartY = 1.35;
+    // m_odometry.resetPosition(null, null, null, null);
     // m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight));
+    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight), new Pose2d(StartX, StartY, new Rotation2d(Math.PI)));
   }
 
   @Override
@@ -132,6 +161,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     // maxPid.setReference(setPoint, SparkMax.ControlType.kVelocity);
 
     // SmartDashboard.putNumber("SetPoint", setPoint);
+    
     SmartDashboard.putNumber("Velocity", m_EncoderLeft.getVelocity());
     SmartDashboard.putNumber("Velocity", m_EncoderRight.getVelocity());
     
@@ -141,6 +171,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("EncoderLeft", getEncoderMeters(m_EncoderLeft));
     SmartDashboard.putNumber("EncoderRight", getEncoderMeters(m_EncoderRight));
     // SmartDashboard.putNumber("xValue", RobotContainer.driverController.getLeftY());
+    SmartDashboard.putNumber("Heading", getHeading());
 
     m_odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight));
     m_field.setRobotPose(m_odometry.getPoseMeters());
@@ -148,16 +179,23 @@ public class CANDriveSubsystem extends SubsystemBase {
   }
 
   private double getEncoderMeters(RelativeEncoder enc){
-    return enc.getPosition()*DriveConstants.kEncoderDistancePerRevolution; 
+    return enc.getPosition();
   }
   
-  public void testDrive(double xSpeed, double zRotation) {
+  public void driveVelocity(double xSpeed, double zRotation) {
   
     double leftSpeed = xSpeed - zRotation;
     double rightSpeed = xSpeed + zRotation;
 
-    rightPid.setReference(rightSpeed, SparkMax.ControlType.kVelocity);
-    leftPid.setReference(leftSpeed, SparkMax.ControlType.kVelocity);
+    rightPid.setReference(rightSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+    leftPid.setReference(leftSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+
+    drive.feed();
+
+    SmartDashboard.putNumber("rightSpeed", rightSpeed);
+    SmartDashboard.putNumber("leftSpeed", leftSpeed);
+    SmartDashboard.putNumber("rightVelocity", m_EncoderRight.getVelocity());
+    SmartDashboard.putNumber("LeftVelocity", m_EncoderLeft.getVelocity());
   }
 
     // sets the speed of the drive motors
@@ -165,6 +203,14 @@ public class CANDriveSubsystem extends SubsystemBase {
       drive.arcadeDrive(xSpeed, zRotation);
     }
   
+    // sets the speed of the drive motors
+    public void driveArcade(double xSpeed, double zRotation, boolean sqr) {
+      drive.arcadeDrive(xSpeed, zRotation, sqr);
+    }
+  
+    public double getHeading(){
+      return Math.IEEEremainder(gyro.getYaw(), 360);
+    }
   // // Command to drive the robot with joystick inputs
   // public Command driveArcade(
   //     CANDriveSubsystem driveSubsystem, DoubleSupplier xSpeed, DoubleSupplier zRotation) {
