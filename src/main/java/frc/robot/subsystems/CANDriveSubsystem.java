@@ -69,6 +69,13 @@ public class CANDriveSubsystem extends SubsystemBase {
     kMaxOutput = 1; 
     kMinOutput = -1;
     maxRPM = 5700;
+
+    // Tuning parameters for velocity control set to RPM
+    // P = 0.00002
+    // FF = 0.00017
+    // Tuning parameters for velocity control set to m/s
+    // P = 0.005
+    // FF = 0.23
     
   // Create and push Field2d to SmartDashboard.
     m_field = new Field2d();
