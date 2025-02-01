@@ -15,7 +15,7 @@ import frc.robot.subsystems.CANDriveSubsystem;
 public class AutoShort extends Command {
   CANDriveSubsystem driveSubsystem;
   private Timer timer;
-  private double seconds = 3.05;
+  private double seconds = 4;
 
   // Constructor. Runs only once when the command is first created.
   public AutoShort(CANDriveSubsystem driveSubsystem) {

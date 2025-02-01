@@ -23,7 +23,7 @@ public final class Constants {
     public static final int RIGHT_LEADER_ID = 2;
     public static final int RIGHT_FOLLOWER_ID = 8;
 
-    public static final int DRIVE_MOTOR_CURRENT_LIMIT = 20;
+    public static final int DRIVE_MOTOR_CURRENT_LIMIT = 40;
 
     public static final double kConvertInchToMeter = 0.0254;
     public static final double kGearRatio = 10.71;
