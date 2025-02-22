@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.motorcontrol.Victor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,6 +26,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 // import com.revrobotics.spark.config.SparkMaxConfig;
 
 /** Class to run the rollers over CAN */
+@Logged
 public class CANRollerSubsystem extends SubsystemBase {
   // private final SparkMax rollerMotor;
   // private final VictorSPX rollerMotor;

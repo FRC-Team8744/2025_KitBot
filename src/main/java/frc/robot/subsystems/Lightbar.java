@@ -4,10 +4,12 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+@Logged
 public class Lightbar extends SubsystemBase {
   private final AddressableLED m_led;
   private final AddressableLEDBuffer m_ledBuffer;

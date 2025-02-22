@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,6 +38,7 @@ import frc.robot.commands.StraightSequence;
  * the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
+@Logged(name = "Kitbot Robot Container")
 public class RobotContainer {
   // The robot's subsystems
   private final CANDriveSubsystem driveSubsystem = new CANDriveSubsystem();
@@ -122,8 +124,9 @@ public class RobotContainer {
     // joystick matches the WPILib convention of counter-clockwise positive
     driveSubsystem.setDefaultCommand(new DriveCommand(
         () -> -driverController.getLeftY() *
-            (driverController.getHID().getRightBumperButton() ? 1 : 0.5),
-        () -> -driverController.getRightX(),
+            (driverController.getHID().getRightBumperButton() ? 0.3 : 0.1),
+        () -> -driverController.getRightX() *
+            (driverController.getHID().getRightBumperButton() ? 0.3 : 0.1),
         driveSubsystem));
 
     // // Set the default command for the roller subsystem to the command from the

@@ -18,6 +18,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -34,7 +35,7 @@ import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 import com.revrobotics.spark.SparkClosedLoopController;
 
-
+@Logged
 public class CANDriveSubsystem extends SubsystemBase {
   
   private Lightbar Bar_bobik;

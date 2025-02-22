@@ -6,6 +6,10 @@ package frc.robot;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -19,10 +23,20 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * build.gradle file in the
  * project.
  */
+@Logged(name = "KitBot 2025 FRC Team 8744")
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  // Add constructor for Robot class
+  public Robot() {
+    DataLogManager.start();
+
+    // Record both DS control and joystick data
+    DriverStation.startDataLog(DataLogManager.getLog());
+    Epilogue.bind(this);
+  }
 
   /**
    * This function is run when the robot is first started up and should be used
