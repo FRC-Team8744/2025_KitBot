@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.util.Color;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -45,5 +48,22 @@ public final class Constants {
   public static final class OperatorConstants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final int OPERATOR_CONTROLLER_PORT = 1;
+  }
+
+  public static final class LEDConstants {
+    public static final int LEDPWMport = 9;
+
+      // Create an array containing the lengths of each segment
+      public static final int ledSegLens[] = {8, 15, 12, 9, 11, 14, 8, 9};
+      // Optional names for the bufferViews
+
+      public static final int LEDSegmentRightFront = 0;
+      public static final int LEDSegmentRightTop = 1; 
+      public static final int LEDSegmentRightRear = 2;
+      public static final int LEDSegmentRear = 3;
+      public static final int LEDSegmentLeftRear = 4;
+      public static final int LEDSegmentLeftTop = 5;
+      public static final int LEDSegmrntLeftFront = 6;
+      public static final int LEDSegmentFront = 7; 
   }
 }

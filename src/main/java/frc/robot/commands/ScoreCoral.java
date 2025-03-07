@@ -23,6 +23,6 @@ public class ScoreCoral extends SequentialCommandGroup {
     addRequirements(rollerSubsystem);
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new AutoCommand(driveSubsystem), new AutoTurnPID(45, driveSubsystem), new AutoShort(driveSubsystem), new AutoRoller(rollerSubsystem));
+    addCommands(new AutoCommand(driveSubsystem), new AutoTurnPID(-45, driveSubsystem), new AutoShort(driveSubsystem), new AutoRoller(rollerSubsystem));
   }
 }

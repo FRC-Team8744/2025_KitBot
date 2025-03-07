@@ -4,10 +4,14 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.util.Color;
 import java.util.function.DoubleSupplier;
+
+import javax.swing.text.StyleConstants.ColorConstants;
 
 import com.revrobotics.RelativeEncoder;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.fasterxml.jackson.databind.JsonSerializable.Base;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -15,10 +19,15 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,12 +36,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
+
 import com.revrobotics.spark.SparkClosedLoopController;
+import static frc.robot.Constants.LEDConstants.*;
 
 
 public class CANDriveSubsystem extends SubsystemBase {
   
-  private Lightbar Bar_bobik;
+  private Lightbar LED_bar;
 
   private final SparkMax leftLeader;
   private final SparkMax leftFollower;
@@ -62,11 +73,25 @@ public class CANDriveSubsystem extends SubsystemBase {
     kMaxOutput = 1; 
     kMinOutput = -1;
     maxRPM = 5700;
+
+    // rightPid.setP(kP);
+    // rightPid.setI(kI);
+    // rightPid.setD(kD);
+    // rightPid.setIZone(kIz);
+    // rightPid.setFF(kFF);
+    // rightPid.setOutputRange(kMinOutput, kMaxOutput);
+
+    // leftPid.setP(kP);
+    // leftPid.setI(kI);
+    // leftPid.setD(kD);
+    // leftPid.setIZone(kIz);
+    // leftPid.setFF(kFF);
+    // leftPid.setOutputRange(kMinOutput, kMaxOutput);
     
   // Create and push Field2d to SmartDashboard.
     m_field = new Field2d();
     SmartDashboard.putData(m_field);
-    Bar_bobik = new Lightbar();
+    LED_bar = new Lightbar();
 
     // create brushed motors for drive
     leftLeader = new SparkMax(DriveConstants.LEFT_LEADER_ID, MotorType.kBrushless);
@@ -130,6 +155,15 @@ public class CANDriveSubsystem extends SubsystemBase {
     // m_odometry.resetPosition(null, null, null, null);
     // m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight), new Pose2d(StartX, StartY, new Rotation2d(Math.PI)));
+
+    SmartDashboard.putNumber("P Gain", kP);
+    SmartDashboard.putNumber("I Gain", kI);
+    SmartDashboard.putNumber("D Gain", kD);
+    SmartDashboard.putNumber("I Zone", kIz);
+    SmartDashboard.putNumber("Feed Forward", kFF);
+    SmartDashboard.putNumber("Max Output", kMaxOutput);
+    SmartDashboard.putNumber("Min Output", kMinOutput);
+    SmartDashboard.putNumber("Set Rotations", 0);
   }
 
   @Override
@@ -149,6 +183,35 @@ public class CANDriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("EncoderRight", getEncoderMeters(m_EncoderRight));
     // SmartDashboard.putNumber("xValue", RobotContainer.driverController.getLeftY());
     SmartDashboard.putNumber("Heading", getHeading());
+
+     // read PID coefficients from SmartDashboard
+     double p = SmartDashboard.getNumber("P Gain", 0);
+     double i = SmartDashboard.getNumber("I Gain", 0);
+     double d = SmartDashboard.getNumber("D Gain", 0);
+     double iz = SmartDashboard.getNumber("I Zone", 0);
+     double ff = SmartDashboard.getNumber("Feed Forward", 0);
+     double max = SmartDashboard.getNumber("Max Output", 0);
+     double min = SmartDashboard.getNumber("Min Output", 0);
+     double rotations = SmartDashboard.getNumber("Set Rotations", 0);
+
+    //   // if PID coefficients on SmartDashboard have changed, write new values to controller
+    // if((p != kP)) { leftPid.setP(p); kP = p; }
+    // if((i != kI)) { leftPid.setI(i); kI = i; }
+    // if((d != kD)) { leftPid.setD(d); kD = d; }
+    // if((iz != kIz)) { leftPid.setIZone(iz); kIz = iz; }
+    // if((ff != kFF)) { leftPid.setFF(ff); kFF = ff; }
+    // if((max != kMaxOutput) || (min != kMinOutput)) { 
+    //   leftPid.setOutputRange(min, max); 
+    //   kMinOutput = min; kMaxOutput = max; 
+
+    //   if((p != kP)) { rightPid.setP(p); kP = p; }
+    // if((i != kI)) { rightPid.setI(i); kI = i; }
+    // if((d != kD)) { rightPid.setD(d); kD = d; }
+    // if((iz != kIz)) { rightPid.setIZone(iz); kIz = iz; }
+    // if((ff != kFF)) { rightPid.setFF(ff); kFF = ff; }
+    // if((max != kMaxOutput) || (min != kMinOutput)) { 
+    //   rightPid.setOutputRange(min, max); 
+    //   kMinOutput = min; kMaxOutput = max; 
 
     m_odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight));
     m_field.setRobotPose(m_odometry.getPoseMeters());
@@ -171,8 +234,16 @@ public class CANDriveSubsystem extends SubsystemBase {
     // sets the speed of the drive motors
     public void driveArcade(double xSpeed, double zRotation) {
       drive.arcadeDrive(xSpeed, zRotation);
-    }
-  
+
+      LED_bar.SetSegmentByValue(1, xSpeed, -.1, 0, LED_bar.green, LED_bar.black, LED_bar.orange_red, 50);
+      LED_bar.SetSegmentByValue(2, xSpeed, -.1, 0, LED_bar.green, LED_bar.black, LED_bar.orange, 50);
+      LED_bar.SetSegmentByValue(3, xSpeed, -.1, 0, LED_bar.green, LED_bar.black, LED_bar.yellow, 50);
+      LED_bar.SetSegmentByValue(4, xSpeed, -.1, 0, LED_bar.green, LED_bar.black, LED_bar.green, 50);
+      LED_bar.SetSegmentByValue(5, xSpeed, -.1, 0, LED_bar.green, LED_bar.black, LED_bar.blue, 50);
+      LED_bar.SetSegmentByValue(6, xSpeed, -.1, 0, LED_bar.green, LED_bar.black, LED_bar.purple, 50);
+      LED_bar.SetSegmentByValue(7, xSpeed, -.1, 0, LED_bar.green, LED_bar.black, LED_bar.pink, 50);
+        }
+
     // sets the speed of the drive motors
     public void driveArcade(double xSpeed, double zRotation, boolean sqr) {
       drive.arcadeDrive(xSpeed, zRotation, sqr);
