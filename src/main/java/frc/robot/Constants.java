@@ -23,7 +23,9 @@ public final class Constants {
     public static final int RIGHT_LEADER_ID = 2;
     public static final int RIGHT_FOLLOWER_ID = 8;
 
-    public static final int DRIVE_MOTOR_CURRENT_LIMIT = 20;
+    public static final int DRIVE_MOTOR_CURRENT_LIMIT = 40;
+
+    public static final double kNeoMaxRPM = 5700;
 
     public static final double kConvertInchToMeter = 0.0254;
     public static final double kGearRatio = 10.71;
@@ -32,6 +34,7 @@ public final class Constants {
     public static final double kWheelDiameterInches = 6.0;
     public static final double kWheelDiameterMeters = kWheelDiameterInches * kConvertInchToMeter;
     public static final double kEncoderDistancePerRevolution = (kWheelDiameterMeters * Math.PI) / kGearRatio;
+    public static final double kNeoMaxVelocity = kEncoderDistancePerRevolution * kNeoMaxRPM / 60.0; //converting to meters per second
   
   }
 

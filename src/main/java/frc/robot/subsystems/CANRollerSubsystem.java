@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RollerConstants;
 import java.util.function.DoubleSupplier;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -50,12 +52,17 @@ public class CANRollerSubsystem extends SubsystemBase {
   public void periodic() {
   }
 
-  // Command to run the roller with joystick inputs
-  public Command runRoller(
-      CANRollerSubsystem rollerSubsystem, DoubleSupplier forward, DoubleSupplier reverse) {
-    return Commands.run(
-        // () -> rollerMotor.set(forward.getAsDouble() - reverse.getAsDouble()), rollerSubsystem);
-        () -> rollerMotor.set(ControlMode.PercentOutput, forward.getAsDouble() - reverse.getAsDouble()), rollerSubsystem); 
+  // // Command to run the roller with joystick inputs
+  // public Command runRoller(
+  //     CANRollerSubsystem rollerSubsystem, DoubleSupplier forward, DoubleSupplier reverse) {
+  //   return Commands.run(
+  //       // () -> rollerMotor.set(forward.getAsDouble() - reverse.getAsDouble()), rollerSubsystem);
+  //       () -> rollerMotor.set(ControlMode.PercentOutput, forward.getAsDouble() - reverse.getAsDouble()), rollerSubsystem); 
+  // }
+
+  /** This is a method that makes the roller spin */
+  public void runRoller(double forward, double reverse) {
+    rollerMotor.set(ControlMode.PercentOutput, forward - reverse);
   }
 
 }
