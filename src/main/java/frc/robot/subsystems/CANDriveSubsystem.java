@@ -8,6 +8,7 @@ import java.util.function.DoubleSupplier;
 
 import com.revrobotics.RelativeEncoder;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.WPI_PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -21,12 +22,15 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelPositions;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -55,9 +59,18 @@ public class CANDriveSubsystem extends SubsystemBase {
   // private PigeonIMU gyro; 
  // Create Field2d for robot and trajectory visualizations.
   public Field2d m_field;
-  private final DifferentialDriveOdometry m_odometry;
+  private DifferentialDriveOdometry m_odometry;
+  private DifferentialDriveWheelPositions m_DiffEncoders;
 
-  private PigeonIMU gyro;
+  // private PigeonIMU gyro;
+  private WPI_PigeonIMU gyro;
+  
+  public static final double kConvertInchToMeter = 0.0254;
+
+  public static final double kTrackwidthInches = 18.5;
+  public static final double kTrackwidthMeters = kTrackwidthInches * kConvertInchToMeter;
+  public static final DifferentialDriveKinematics kDriveKinematics =
+      new DifferentialDriveKinematics(kTrackwidthMeters);
 
   public CANDriveSubsystem() {
 
@@ -95,8 +108,8 @@ public class CANDriveSubsystem extends SubsystemBase {
     drive = new DifferentialDrive(leftLeader, rightLeader);
 
     // Gryo objects
-    gyro = new PigeonIMU(13);
-  
+    gyro = new WPI_PigeonIMU(13);
+
     // PigeonIMU.GeneralStatus gyro_stat = new PigeonIMU.GeneralStatus();
 
     // Set can timeout. Because this project only sets parameters once on
@@ -260,4 +273,57 @@ public class CANDriveSubsystem extends SubsystemBase {
   //   return Commands.run(
   //       () -> drive.arcadeDrive(xSpeed.getAsDouble(), zRotation.getAsDouble()), driveSubsystem);
   // }
+
+  // public void resetPose() {
+  //   gyro.setYaw(0);
+  //   resetOdometry();
+  //   m_odometry.resetPosition(
+  //       gyro.getRotation2d(),
+  //       new DifferentialDriveWheelPositions(
+  //         Rotation2d.fromDegrees(gyro.getYaw()),
+  //         getEncoderMeters(m_EncoderLeft),
+  //         getEncoderMeters(m_EncoderRight),
+  //         new Pose2d(StartX, StartY, new Rotation2d(Math.PI))),
+  //       new Pose2d());
+  //   m_poseEstimator.resetPosition(gyro.getRotation2d(), getModulePositions(), pose);
+  // }
+
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(m_EncoderLeft.getVelocity(), m_EncoderRight.getVelocity());
+  }
+
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetOdometry(Pose2d pose) {
+    m_EncoderLeft.setPosition(0.0);
+    m_EncoderRight.setPosition(0.0);
+    m_odometry.resetPosition(
+      gyro.getRotation2d(), m_EncoderLeft.getPosition(), m_EncoderRight.getPosition(), pose);
+  }
+
+  /**
+   * Returns the currently-estimated pose of the robot.
+   *
+   * @return The pose.
+   */
+  public Pose2d getPose() {
+    return m_odometry.getPoseMeters();
+  }
+
+  public ChassisSpeeds getRobotRelativeSpeeds(){
+    return kDriveKinematics.toChassisSpeeds(getWheelSpeeds());
+  }
+
+  public void driveRobotRelative(ChassisSpeeds speeds){
+    var wheelSpeeds = kDriveKinematics.toWheelSpeeds(speeds);
+
+    leftPid.setReference(wheelSpeeds.leftMetersPerSecond, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+    rightPid.setReference(wheelSpeeds.rightMetersPerSecond, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+
+    // drive.feed();
+  }
+
 }
