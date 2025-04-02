@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -75,11 +76,11 @@ public class CANDriveSubsystem extends SubsystemBase {
   public CANDriveSubsystem() {
 
     // PID coefficients
-    kP = 6e-5; 
+    kP = 0.000001; //6e-5; 
     kI = 0;
     kD = 0; 
     kIz = 0; 
-    kFF = 0.000015; 
+    kFF = 0.00017; //0.000015; 
     kMaxOutput = 1; 
     kMinOutput = -1;
     maxRPM = 5700;
@@ -247,6 +248,9 @@ public class CANDriveSubsystem extends SubsystemBase {
   
     double leftSpeed = xSpeed - zRotation;
     double rightSpeed = xSpeed + zRotation;
+
+    rightSpeed = (rightSpeed/DriveConstants.kEncoderDistancePerRevolution) * 60.0 ; 
+    leftSpeed = (leftSpeed/DriveConstants.kEncoderDistancePerRevolution) * 60.0 ; 
 
     rightPid.setReference(rightSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
     leftPid.setReference(leftSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);

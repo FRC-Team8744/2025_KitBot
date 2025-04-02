@@ -4,7 +4,10 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.CANDriveSubsystem;
 import java.util.function.DoubleSupplier;
 
@@ -35,8 +38,14 @@ public class DriveCommand extends Command {
   // Runs every cycle while the command is scheduled (~50 times per second)
   @Override
   public void execute() {
-    driveSubsystem.driveArcade(xSpeed.getAsDouble(), zRotation.getAsDouble());
-    // driveSubsystem.testDrive(xSpeed.getAsDouble(), zRotation.getAsDouble());
+    // driveSubsystem.driveArcade(xSpeed.getAsDouble(), zRotation.getAsDouble());
+    driveSubsystem.testDrive(4.3*xSpeed.getAsDouble(), zRotation.getAsDouble());
+
+    // double forwardSpeed = (xSpeed.getAsDouble()/DriveConstants.kEncoderDistancePerRevolution) * 60.0 ; 
+    // double rotSpeed = (zRotation.getAsDouble()/DriveConstants.kEncoderDistancePerRevolution) * 60.0 ; 
+    // ChassisSpeeds driveSpeeds = new ChassisSpeeds(forwardSpeed, 0, rotSpeed);
+    // SmartDashboard.putNumber("JoyX", 4.3*xSpeed.getAsDouble());
+    // driveSubsystem.driveRobotRelative(driveSpeeds);
   }
 
   // Runs each time the command ends via isFinished or being interrupted.
