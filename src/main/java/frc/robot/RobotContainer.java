@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -134,11 +135,14 @@ public class RobotContainer {
     // Set the default command for the roller subsystem to an instance of
     // RollerCommand with the values provided by the triggers on the operator
     // controller
-    rollerSubsystem.setDefaultCommand(new RollerCommand(
-        () -> driverController.getRightTriggerAxis() *.75,
-        () -> driverController.getLeftTriggerAxis() *.75,
-        rollerSubsystem));
+    driverController.rightTrigger().onTrue(Commands.run(()->rollerSubsystem.runRoller(.67, 0), rollerSubsystem));
+    driverController.leftTrigger().onTrue(Commands.run(()->rollerSubsystem.runRoller(.67, 0), rollerSubsystem));
   }
+  //   rollerSubsystem.setDefaultCommand(new RollerCommand(
+  //       () -> driverController.getRightTriggerAxis() *.75,
+  //       () -> driverController.getLeftTriggerAxis() *.75,
+  //       rollerSubsystem));
+  // }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

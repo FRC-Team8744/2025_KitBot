@@ -154,6 +154,8 @@ public class CANDriveSubsystem extends SubsystemBase {
     m_EncoderRight = Frontright.getEncoder();
     RelativeEncoder m_EncoderRLeft = Rearleft.getEncoder();
     RelativeEncoder m_EncoderRRight = Rearright.getEncoder();
+    m_EncoderRLeft.setPosition(0.0);
+    m_EncoderRRight.setPosition(0.0);
     m_EncoderLeft.setPosition(0.0);
     m_EncoderRight.setPosition(0.0);
     gyro.setYaw(0.0);  
