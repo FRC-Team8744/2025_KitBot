@@ -54,7 +54,7 @@ public class AutoTurnPID extends Command {
     m_heading = m_drive.getHeading();
     m_output = MathUtil.clamp(m_turnCtrl.calculate(m_heading), -1.0, 1.0);
     // Send PID output to drivebase
-    m_drive.driveArcade(0.0, m_output, false);
+    m_drive.drive(0.0, 0.0, m_output);
     // m_drive.tankDriveVolts(m_output, -m_output);
 
     // Debug information
@@ -68,7 +68,7 @@ public class AutoTurnPID extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drive.driveArcade(0.0, 0.0);
+    m_drive.drive(0.0, 0.0, 0.0);
   }
 
   // Returns true when the command should end.

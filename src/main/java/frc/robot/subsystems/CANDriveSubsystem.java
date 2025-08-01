@@ -19,9 +19,15 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
+import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,13 +44,13 @@ public class CANDriveSubsystem extends SubsystemBase {
   
   private Lightbar Bar_bobik;
 
-  private final SparkMax leftLeader;
-   private final SparkMax leftFollower;
-  private final SparkMax rightLeader;
-  private final SparkMax rightFollower;
+  private final SparkMax Frontleft;
+   private final SparkMax Rearleft;
+  private final SparkMax Frontright;
+  private final SparkMax Rearright;
   private RelativeEncoder m_EncoderLeft;
   private RelativeEncoder m_EncoderRight; 
-  private final DifferentialDrive drive;
+  private final MecanumDrive drive;
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
   private SparkClosedLoopController rightPid;
   private SparkClosedLoopController leftPid;
@@ -53,7 +59,7 @@ public class CANDriveSubsystem extends SubsystemBase {
   private PigeonIMU gyro; 
  // Create Field2d for robot and trajectory visualizations.
   public Field2d m_field;
-  private final DifferentialDriveOdometry m_odometry;
+  private final MecanumDriveOdometry m_odometry;
 
   public CANDriveSubsystem() {
 
@@ -73,15 +79,15 @@ public class CANDriveSubsystem extends SubsystemBase {
     Bar_bobik = new Lightbar();
 
     // create brushed motors for drive
-    leftLeader = new SparkMax(DriveConstants.LEFT_LEADER_ID, MotorType.kBrushless);
-    leftFollower = new SparkMax(DriveConstants.LEFT_FOLLOWER_ID, MotorType.kBrushless);
-    rightLeader = new SparkMax(DriveConstants.RIGHT_LEADER_ID, MotorType.kBrushless);
-    rightFollower = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless); 
-    rightPid = rightLeader.getClosedLoopController();
-    leftPid = leftLeader.getClosedLoopController();
+    Frontleft = new SparkMax(DriveConstants.LEFT_LEADER_ID, MotorType.kBrushless);
+    Rearleft = new SparkMax(DriveConstants.LEFT_FOLLOWER_ID, MotorType.kBrushless);
+    Frontright = new SparkMax(DriveConstants.RIGHT_LEADER_ID, MotorType.kBrushless);
+    Rearright = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless); 
+    rightPid = Frontright.getClosedLoopController();
+    leftPid = Frontleft.getClosedLoopController();
 
     // set up differential drive class
-    drive = new DifferentialDrive(leftLeader, rightLeader);
+    drive = new MecanumDrive(Frontleft, Rearleft, Frontright, Rearright);
 
     gyro = new PigeonIMU(13);
    
@@ -89,9 +95,11 @@ public class CANDriveSubsystem extends SubsystemBase {
     // Set can timeout. Because this project only sets parameters once on
     // construction, the timeout can be long without blocking robot operation. Code
     // which sets or gets parameters during operation may need a shorter timeout.
-    leftLeader.setCANTimeout(250);
-    rightLeader.setCANTimeout(250);
-//    // Create the configuration to apply to motors. Voltage compensation
+    Frontleft.setCANTimeout(250);
+    Rearleft.setCANTimeout(250);
+    Frontright.setCANTimeout(250);
+    Rearright.setCANTimeout(  250);
+    //    // Create the configuration to apply to motors. Voltage compensation
     // helps the robot perform more similarly on different
     // battery voltages (at the cost of a little bit of top speed on a fully charged
     // battery). The current limit helps prevent tripping
@@ -128,31 +136,36 @@ public class CANDriveSubsystem extends SubsystemBase {
     // Set configuration to follow leader and then apply it to corresponding
      //follower. Resetting in case a new controller is swapped
     // in and persisting in case of a controller reset due to breaker trip
-    config.follow(leftLeader);
-    leftFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    config.follow(rightLeader);
-    rightFollower.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    Frontleft.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    Rearleft.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+    
 
     // Remove following, then apply config to right leader
-    config.disableFollowerMode();
+    
     config.inverted(true);
-    rightLeader.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    Frontright.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // Set conifg to inverted and then apply to left leader. Set Left side inverted
     // so that postive values drive both sides forward
-    config.inverted(false);
-    leftLeader.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+   
+    Frontleft.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    m_EncoderLeft = leftLeader.getEncoder();
-    m_EncoderRight = rightLeader.getEncoder();
+    m_EncoderLeft = Frontleft.getEncoder();
+    m_EncoderRight = Frontright.getEncoder();
+    RelativeEncoder m_EncoderRLeft = Rearleft.getEncoder();
+    RelativeEncoder m_EncoderRRight = Rearright.getEncoder();
     m_EncoderLeft.setPosition(0.0);
     m_EncoderRight.setPosition(0.0);
     gyro.setYaw(0.0);  
 
+
     double StartX = 8.016;
     double StartY = 1.35;
     // m_odometry.resetPosition(null, null, null, null);
-    // m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight), new Pose2d(StartX, StartY, new Rotation2d(Math.PI)));
+   MecanumDriveKinematics Mecanum = new MecanumDriveKinematics(new Translation2d(.2775,.2725), new Translation2d(.2775,-.2725), new Translation2d(-.2775,.2725), new Translation2d(-.2775,-.2725));
+   MecanumDriveWheelPositions Wheels = new MecanumDriveWheelPositions(Frontleft.getEncoder().getPosition(), Frontright.getEncoder().getPosition(), Rearleft.getEncoder().getPosition(), Rearright.getEncoder().getPosition());
+   // m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_odometry = new MecanumDriveOdometry(Mecanum, Rotation2d.fromDegrees(gyro.getYaw()), Wheels);
   }
 
   @Override
@@ -173,7 +186,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     // SmartDashboard.putNumber("xValue", RobotContainer.driverController.getLeftY());
     SmartDashboard.putNumber("Heading", getHeading());
 
-    m_odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), getEncoderMeters(m_EncoderLeft), getEncoderMeters(m_EncoderRight));
+    m_odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), new MecanumDriveWheelPositions(Frontleft.getEncoder().getPosition(), Frontright.getEncoder().getPosition(), Rearleft.getEncoder().getPosition(), Rearright.getEncoder().getPosition())); 
     m_field.setRobotPose(m_odometry.getPoseMeters());
     
   }
@@ -199,13 +212,8 @@ public class CANDriveSubsystem extends SubsystemBase {
   }
 
     // sets the speed of the drive motors
-    public void driveArcade(double xSpeed, double zRotation) {
-      drive.arcadeDrive(xSpeed, zRotation);
-    }
-  
-    // sets the speed of the drive motors
-    public void driveArcade(double xSpeed, double zRotation, boolean sqr) {
-      drive.arcadeDrive(xSpeed, zRotation, sqr);
+    public void drive(double xSpeed, double ySpeed, double zRotation) {
+      drive.driveCartesian(xSpeed, ySpeed, zRotation);
     }
   
     public double getHeading(){

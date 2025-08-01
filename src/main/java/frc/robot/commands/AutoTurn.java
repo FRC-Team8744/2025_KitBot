@@ -42,14 +42,14 @@ public class AutoTurn extends Command {
   @Override
   public void execute() {
     // drive at 1/2 speed
-    driveSubsystem.driveArcade(0.0, -.43);
+    driveSubsystem.drive(0.0, 0.0, -.43);
   }
 
   // Runs each time the command ends via isFinished or being interrupted.
   @Override
   public void end(boolean isInterrupted) {
     // stop drive motors
-    driveSubsystem.driveArcade(0.0, 0.0);
+    driveSubsystem.drive(0.0, 0.0, 0.0);
   }
 
   // Runs every cycle while the command is scheduled to check if the command is
