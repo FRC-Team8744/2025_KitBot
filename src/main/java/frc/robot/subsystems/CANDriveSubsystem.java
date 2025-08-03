@@ -54,6 +54,8 @@ public class CANDriveSubsystem extends SubsystemBase {
   public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
   private SparkClosedLoopController rightPid;
   private SparkClosedLoopController leftPid;
+  private SparkClosedLoopController rearRightPid;
+  private SparkClosedLoopController rearLeftPid;
 
 
   private PigeonIMU gyro; 
@@ -85,11 +87,13 @@ public class CANDriveSubsystem extends SubsystemBase {
     Rearright = new SparkMax(DriveConstants.RIGHT_FOLLOWER_ID, MotorType.kBrushless); 
     rightPid = Frontright.getClosedLoopController();
     leftPid = Frontleft.getClosedLoopController();
+    rearRightPid = Rearright.getClosedLoopController();
+    rearLeftPid = Rearleft.getClosedLoopController();
 
     // set up differential drive class
     drive = new MecanumDrive(Frontleft, Rearleft, Frontright, Rearright);
 
-    gyro = new PigeonIMU(13);
+    gyro = new PigeonIMU(5);
    
 
     // Set can timeout. Because this project only sets parameters once on
@@ -148,7 +152,7 @@ public class CANDriveSubsystem extends SubsystemBase {
     // Set conifg to inverted and then apply to left leader. Set Left side inverted
     // so that postive values drive both sides forward
    
-    Frontleft.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // Frontleft.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     m_EncoderLeft = Frontleft.getEncoder();
     m_EncoderRight = Frontright.getEncoder();
@@ -203,7 +207,9 @@ public class CANDriveSubsystem extends SubsystemBase {
     double rightSpeed = xSpeed + zRotation;
 
     rightPid.setReference(rightSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+    rearRightPid.setReference(rightSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
     leftPid.setReference(leftSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+    rearLeftPid.setReference(leftSpeed, SparkMax.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
 
     drive.feed();
 

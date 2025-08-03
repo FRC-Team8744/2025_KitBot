@@ -22,6 +22,7 @@ import frc.robot.commands.AutoStraight;
 import frc.robot.commands.AutoTurn;
 import frc.robot.commands.AutoTurnPID;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.DriveRealCommand;
 import frc.robot.commands.RollerCommand;
 import frc.robot.commands.ScoreCoral;
 import frc.robot.commands.StraightSequence;
@@ -118,11 +119,18 @@ public class RobotContainer {
     // stick away from you (a negative value) drives the robot forwards (a positive
     // value). Similarly for the X axis where we need to flip the value so the
     // joystick matches the WPILib convention of counter-clockwise positive
-    driveSubsystem.setDefaultCommand(new DriveCommand(
-        () -> -driverController.getLeftY() *
-            (driverController.getHID().getRightBumperButton() ? 0.5 : 1),
-        () -> -driverController.getRightX() *0.5,
-        driveSubsystem));
+    // driveSubsystem.setDefaultCommand(new DriveCommand(
+    //     () -> -driverController.getLeftY() *
+    //         (driverController.getHID().getRightBumperButton() ? 0.5 : 1),
+    //     () -> -driverController.getRightX() * 0.5,
+    //     driveSubsystem));
+
+    driveSubsystem.setDefaultCommand(new DriveRealCommand(
+      () -> -driverController.getLeftY() *
+          (driverController.getHID().getRightBumperButton() ? 0.5 : 1),
+          () ->driverController.getLeftX() * (driverController.getHID().getRightBumperButton() ? 0.5 : 1),
+      () -> -driverController.getRightX() * 0.5,
+      driveSubsystem));
 
 
     // // Set the default command for the roller subsystem to the command from the
