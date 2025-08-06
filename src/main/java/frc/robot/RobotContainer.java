@@ -4,10 +4,14 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -68,14 +72,10 @@ public class RobotContainer {
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
-    autoChooser.addOption("Autonomous", new AutoCommand(driveSubsystem));
-    autoChooser.addOption("AutoTurnPID", new AutoTurnPID(45, driveSubsystem));
-    autoChooser.addOption("AutoTurnPID2", new AutoTurnPID(-45, driveSubsystem));
-    autoChooser.addOption("AutoShort", new AutoShort(driveSubsystem));
-    autoChooser.setDefaultOption("ScoreCoral", new ScoreCoral(driveSubsystem, rollerSubsystem));
-
-    autoChooser.addOption("StraightSequence", new StraightSequence(driveSubsystem, rollerSubsystem));
-    autoChooser.addOption("AutoStraight", new AutoStraight(driveSubsystem, 3.2));
+    NamedCommands.registerCommand("L1", Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem));
+    autoChooser.setDefaultOption("none", new InstantCommand());
+    autoChooser.addOption("Gyarados", new PathPlannerAuto("Gyarados"));
+    
 
     SmartDashboard.putData("Auto Path", autoChooser);
 
@@ -129,7 +129,7 @@ public class RobotContainer {
       () -> -driverController.getLeftY() *
           (driverController.getHID().getRightBumperButton() ? 0.5 : 1),
           () ->driverController.getLeftX() * (driverController.getHID().getRightBumperButton() ? 0.5 : 1),
-      () -> -driverController.getRightX() * 0.5,
+      () -> driverController.getRightX() * 0.5,
       driveSubsystem));
 
 
@@ -143,8 +143,9 @@ public class RobotContainer {
     // Set the default command for the roller subsystem to an instance of
     // RollerCommand with the values provided by the triggers on the operator
     // controller
-    driverController.rightTrigger().onTrue(Commands.run(()->rollerSubsystem.runRoller(.67, 0), rollerSubsystem));
-    driverController.leftTrigger().onTrue(Commands.run(()->rollerSubsystem.runRoller(.67, 0), rollerSubsystem));
+
+    driverController.rightTrigger().whileTrue(Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem)).whileFalse(Commands.run(()->rollerSubsystem.runRoller(0, 0), rollerSubsystem));
+    driverController.leftTrigger().whileTrue(Commands.run(()->rollerSubsystem.runRoller(.65, 0), rollerSubsystem)).whileFalse(Commands.run(()->rollerSubsystem.runRoller(0, 0), rollerSubsystem));
   }
   //   rollerSubsystem.setDefaultCommand(new RollerCommand(
   //       () -> driverController.getRightTriggerAxis() *.75,

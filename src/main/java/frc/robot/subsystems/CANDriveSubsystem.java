@@ -17,6 +17,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -221,6 +222,9 @@ public class CANDriveSubsystem extends SubsystemBase {
 
     // sets the speed of the drive motors
     public void drive(double xSpeed, double ySpeed, double zRotation) {
+    xSpeed = MathUtil.applyDeadband(xSpeed , .05);
+    ySpeed = MathUtil.applyDeadband(ySpeed, .05);
+    zRotation = MathUtil.applyDeadband(zRotation, .05);
       drive.driveCartesian(xSpeed, ySpeed, zRotation);
     }
   
