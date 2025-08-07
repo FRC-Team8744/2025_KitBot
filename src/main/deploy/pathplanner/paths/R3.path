@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.600204918032786,
-        "y": 4.030993852459016
+        "x": 1.21875,
+        "y": 1.060999999999999
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.868954918032787,
-        "y": 4.019006147540983
+        "x": 3.46125,
+        "y": 2.6014999999999997
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "R2"
     },
     {
       "anchor": {
-        "x": 5.873975409836065,
-        "y": 4.030993852459016
+        "x": 3.7245000000000004,
+        "y": 2.7867499999999996
       },
       "prevControl": {
-        "x": 6.868954918032787,
-        "y": 4.030993852459016
+        "x": 2.4375,
+        "y": 1.8994999999999993
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "M1"
+      "linkedName": "R3"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 55.581635520943735
   },
   "reversed": false,
   "folder": "Kitbot Reef",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 55.00797980144132
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

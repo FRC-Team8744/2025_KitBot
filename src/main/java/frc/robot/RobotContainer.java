@@ -72,12 +72,14 @@ public class RobotContainer {
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
+   final SendableChooser<Command> m_chooser = new SendableChooser<>();
     NamedCommands.registerCommand("L1", Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem));
     autoChooser.setDefaultOption("none", new InstantCommand());
-    autoChooser.addOption("Gyarados", new PathPlannerAuto("Gyarados"));
+    autoChooser.addOption("MiddleGyarados", new PathPlannerAuto("MiddleGyarados"));
+    autoChooser.addOption("LeftGyarados", new PathPlannerAuto("LeftGyarados"));
     
 
-    SmartDashboard.putData("Auto Path", autoChooser);
+    SmartDashboard.putData("Auto Chooser", m_chooser);
 
   }
 

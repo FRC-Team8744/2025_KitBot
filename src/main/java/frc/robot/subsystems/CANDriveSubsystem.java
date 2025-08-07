@@ -177,6 +177,9 @@ public class CANDriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    m_odometry.update(
+    Rotation2d.fromDegrees(gyro.getYaw()),
+    new MecanumDriveWheelPositions());
     // double setPoint = m_stick.getY()*maxRPM;
     // maxPid.setReference(setPoint, SparkMax.ControlType.kVelocity);
 
@@ -227,7 +230,19 @@ public class CANDriveSubsystem extends SubsystemBase {
     zRotation = MathUtil.applyDeadband(zRotation, .05);
       drive.driveCartesian(xSpeed, ySpeed, zRotation);
     }
-  
+    public void driveFieldOriented(double xSpeed, double ySpeed, double zRotation) {
+      xSpeed = MathUtil.applyDeadband(xSpeed, 0.05);
+      ySpeed = MathUtil.applyDeadband(ySpeed, 0.05);
+      zRotation = MathUtil.applyDeadband(zRotation, 0.05);
+    
+      double yaw = getHeading(); // your gyro reads yaw in degrees
+      Rotation2d gyroAngle = Rotation2d.fromDegrees(yaw);
+      drive.driveCartesian(xSpeed, ySpeed, zRotation, gyroAngle);
+      
+    }
+
+    
+    
     public double getHeading(){
       return Math.IEEEremainder(gyro.getYaw(), 360);
     }
