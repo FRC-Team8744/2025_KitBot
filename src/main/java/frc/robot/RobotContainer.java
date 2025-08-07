@@ -74,9 +74,12 @@ public class RobotContainer {
     // autoChooser.addOption
    final SendableChooser<Command> m_chooser = new SendableChooser<>();
     NamedCommands.registerCommand("L1", Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem));
+    NamedCommands.registerCommand("L1.2", Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem));
+    NamedCommands.registerCommand("L1.3", Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem));
     autoChooser.setDefaultOption("none", new InstantCommand());
     autoChooser.addOption("MiddleGyarados", new PathPlannerAuto("MiddleGyarados"));
     autoChooser.addOption("LeftGyarados", new PathPlannerAuto("LeftGyarados"));
+    autoChooser.addOption("RightGyarados", new PathPlannerAuto("RightGyarados"));
     
 
     SmartDashboard.putData("Auto Chooser", m_chooser);
