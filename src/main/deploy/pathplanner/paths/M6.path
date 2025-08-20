@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.7732500000000004,
+        "y": 5.253499999999999
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.9250000000000007,
+        "y": 5.8775
+      },
+      "isLocked": false,
+      "linkedName": "M5"
+    },
+    {
+      "anchor": {
+        "x": 1.3162500000000004,
+        "y": 7.07675
+      },
+      "prevControl": {
+        "x": 2.2132500000000004,
+        "y": 6.4625
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -54.29330859939711
+  },
+  "reversed": false,
+  "folder": "Kitbot Reef",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -58.3797464677199
+  },
+  "useDefaultConstraints": true
+}

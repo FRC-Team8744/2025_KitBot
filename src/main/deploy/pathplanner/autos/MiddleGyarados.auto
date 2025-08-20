@@ -51,6 +51,12 @@
           "data": {
             "name": "L1.3"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "M6"
+          }
         }
       ]
     }

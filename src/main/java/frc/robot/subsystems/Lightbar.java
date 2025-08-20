@@ -15,7 +15,7 @@ public class Lightbar extends SubsystemBase {
   public Lightbar() {
     // PWM port 9
     // Must be a PWM header, not MXP or DIO
-    m_led = new AddressableLED(9);
+    m_led = new AddressableLED(0);
 
     // Reuse buffer
     // Default to a length of 60, start empty output
@@ -40,13 +40,19 @@ public class Lightbar extends SubsystemBase {
    * @param g the g value [0-255]
    * @param b the b value [0-255]
    */
-  public void setRBG( int index, int r, int b, int g) {
-    m_ledBuffer.setRGB(index, r, b, g);
+  public void setRBG(int index, int r, int g, int b) {
+    m_ledBuffer.setRGB(index, r, g, b);
+  }
+
+  public void setColor(int r, int g, int b) {
+    for (int index = 0; index < m_ledBuffer.getLength(); index++) {
+      m_ledBuffer.setRGB(index, r, g, b);
+    }
   }
 
   public void clearLEDs() {
       for (int index = 0; index < m_ledBuffer.getLength(); index++) {
-        m_ledBuffer.setRGB(index, 0, 0, 0);
+        m_ledBuffer.setRGB(index, 0, 0, 225);
       }
     }
 

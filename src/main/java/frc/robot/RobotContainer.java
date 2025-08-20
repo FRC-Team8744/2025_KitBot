@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -19,7 +20,7 @@ import frc.robot.Constants.RollerConstants;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.CANRollerSubsystem;
-
+import frc.robot.subsystems.Lightbar;
 import frc.robot.commands.AutoCommand;
 import frc.robot.commands.AutoShort;
 import frc.robot.commands.AutoStraight;
@@ -45,6 +46,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final CANDriveSubsystem driveSubsystem = new CANDriveSubsystem();
   private final CANRollerSubsystem rollerSubsystem = new CANRollerSubsystem();
+  private final Lightbar m_lightbar = new Lightbar();
 
   // The driver's controller
   public final CommandXboxController driverController = new CommandXboxController(
@@ -57,7 +59,7 @@ public class RobotContainer {
   //     OperatorConstants.OPERATOR_CONTROLLER_PORT);
 
   // The autonomous chooser
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private final SendableChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -67,12 +69,13 @@ public class RobotContainer {
 
     // // Set the options to show up in the Dashboard for selecting auto modes. If you
     // // add additional auto modes you can add additional lines here with
-    // // autoChooser.addOption
-    // autoChooser.setDefaultOption("Autonomous", Autos.exampleAuto(driveSubsystem));
+    // autoChooser.addOption
+    // autoChooser.setDefaultOption"Autonomous", Autos.exampleAuto(driveSubsystem));
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
-   final SendableChooser<Command> m_chooser = new SendableChooser<>();
+    autoChooser = AutoBuilder.buildAutoChooser();
+    
     NamedCommands.registerCommand("L1", Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem));
     NamedCommands.registerCommand("L1.2", Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem));
     NamedCommands.registerCommand("L1.3", Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem));
@@ -82,7 +85,7 @@ public class RobotContainer {
     autoChooser.addOption("RightGyarados", new PathPlannerAuto("RightGyarados"));
     
 
-    SmartDashboard.putData("Auto Chooser", m_chooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
   }
 
@@ -108,6 +111,8 @@ public class RobotContainer {
     //     .whileTrue(rollerSubsystem.runRoller(rollerSubsystem, () -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0));
     driverController.a()
         .whileTrue(new RollerCommand(() -> RollerConstants.ROLLER_EJECT_VALUE, () -> 0, rollerSubsystem));
+
+    driverController.back().onTrue(Commands.runOnce (() -> driveSubsystem.zeroGyro()));
 
     // // Set the default command for the drive subsystem to the command provided by
     // // factory with the values provided by the joystick axes on the driver
@@ -152,29 +157,30 @@ public class RobotContainer {
     driverController.rightTrigger().whileTrue(Commands.run(()->rollerSubsystem.runRoller(-.55, 0), rollerSubsystem)).whileFalse(Commands.run(()->rollerSubsystem.runRoller(0, 0), rollerSubsystem));
     driverController.leftTrigger().whileTrue(Commands.run(()->rollerSubsystem.runRoller(.65, 0), rollerSubsystem)).whileFalse(Commands.run(()->rollerSubsystem.runRoller(0, 0), rollerSubsystem));
   }
+
+    public Lightbar getLightbar() {
+        return m_lightbar;
+    }
+}
+
   //   rollerSubsystem.setDefaultCommand(new RollerCommand(
   //       () -> driverController.getRightTriggerAxis() *.75,
   //       () -> driverController.getLeftTriggerAxis() *.75,
   //       rollerSubsystem));
-  // }
-  private CommandXboxController m_driver = new CommandXboxController(0);
-  private void configureButtonBindings() { 
-        m_driver.back().onTrue(Commands.runOnce (() -> m_robotDrivezeroGyro()));
-          }
-            
+  // }            
         
-          private Object m_robotDrivezeroGyro() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'm_robotDrivezeroGyro'");
-          }
+          // private Object m_robotDrivezeroGyro() {
+          //   // TODO Auto-generated method stub
+          //   throw new UnsupportedOperationException("Unimplemented method 'm_robotDrivezeroGyro'");
+          // }
         
           /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return autoChooser.getSelected();
-  }
-}
+  // public Command getAutonomousCommand() {
+  //   // An example command will be run in autonomous
+  //   // return autoChooser.getSelected();
+  // }
+

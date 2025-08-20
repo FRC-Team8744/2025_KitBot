@@ -39,7 +39,7 @@ public class DriveRealCommand extends Command {
   @Override
   public void execute() {
     // driveSubsystem.driveArcade(xSpeed.getAsDouble(), zRotation.getAsDouble());
-    driveSubsystem.drive(xSpeed.getAsDouble(),ySpeed.getAsDouble(),zRotation.getAsDouble());
+    driveSubsystem.driveFieldOriented(xSpeed.getAsDouble(),ySpeed.getAsDouble(),zRotation.getAsDouble());
   }
 
   // Runs each time the command ends via isFinished or being interrupted.

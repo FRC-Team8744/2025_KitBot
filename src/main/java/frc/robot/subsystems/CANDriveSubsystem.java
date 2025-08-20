@@ -8,6 +8,11 @@ import java.util.function.DoubleSupplier;
 
 import com.revrobotics.RelativeEncoder;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -21,11 +26,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.math.kinematics.struct.MecanumDriveWheelPositionsStruct;
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
@@ -63,6 +71,8 @@ public class CANDriveSubsystem extends SubsystemBase {
  // Create Field2d for robot and trajectory visualizations.
   public Field2d m_field;
   private final MecanumDriveOdometry m_odometry;
+
+  
 
   public CANDriveSubsystem() {
 
@@ -173,7 +183,39 @@ public class CANDriveSubsystem extends SubsystemBase {
    MecanumDriveWheelPositions Wheels = new MecanumDriveWheelPositions(Frontleft.getEncoder().getPosition(), Frontright.getEncoder().getPosition(), Rearleft.getEncoder().getPosition(), Rearright.getEncoder().getPosition());
    // m_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_odometry = new MecanumDriveOdometry(Mecanum, Rotation2d.fromDegrees(gyro.getYaw()), Wheels);
-  }
+
+    try {
+    AutoBuilder.configure(
+      this::getPose, // Robot pose supplier
+      this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+      this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+      (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+      new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+              new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+              new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+      ),
+     RobotConfig.fromGUISettings(), // The robot configuration
+      () -> {
+        // Boolean supplier that controls when the path will be mirrored for the red alliance
+        // This will flip the path being followed to the red side of the field.
+        // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isPresent()) {
+          return alliance.get() == DriverStation.Alliance.Red;
+        }
+        return false;
+      },
+      this // Reference to this subsystem to set requirements
+  );
+    } catch (Exception e) {
+      DriverStation.reportError(e.getMessage(), e.getStackTrace());
+    }
+  } 
+
+ private void resetPose(Pose2d Autos){}
+ private ChassisSpeeds getRobotRelativeSpeeds(){return null;}
+private void driveRobotRelative(ChassisSpeeds Auto){}
 
   @Override
   public void periodic() {
@@ -199,6 +241,10 @@ public class CANDriveSubsystem extends SubsystemBase {
     m_odometry.update(Rotation2d.fromDegrees(gyro.getYaw()), new MecanumDriveWheelPositions(Frontleft.getEncoder().getPosition(), Frontright.getEncoder().getPosition(), Rearleft.getEncoder().getPosition(), Rearright.getEncoder().getPosition())); 
     m_field.setRobotPose(m_odometry.getPoseMeters());
     
+  }
+
+  public Pose2d getPose() {
+    return m_odometry.getPoseMeters();
   }
 
   private double getEncoderMeters(RelativeEncoder enc){
@@ -230,18 +276,20 @@ public class CANDriveSubsystem extends SubsystemBase {
     zRotation = MathUtil.applyDeadband(zRotation, .05);
       drive.driveCartesian(xSpeed, ySpeed, zRotation);
     }
+
     public void driveFieldOriented(double xSpeed, double ySpeed, double zRotation) {
       xSpeed = MathUtil.applyDeadband(xSpeed, 0.05);
       ySpeed = MathUtil.applyDeadband(ySpeed, 0.05);
       zRotation = MathUtil.applyDeadband(zRotation, 0.05);
     
       double yaw = getHeading(); // your gyro reads yaw in degrees
-      Rotation2d gyroAngle = Rotation2d.fromDegrees(yaw);
+      Rotation2d gyroAngle = Rotation2d.fromDegrees(-yaw);
       drive.driveCartesian(xSpeed, ySpeed, zRotation, gyroAngle);
-      
     }
 
-    
+    public void zeroGyro() {
+      gyro.setYaw(0);
+    }
     
     public double getHeading(){
       return Math.IEEEremainder(gyro.getYaw(), 360);
